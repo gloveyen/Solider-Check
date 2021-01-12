@@ -25,47 +25,26 @@
         </router-link>
       </a-menu-item>
 
-      <a-menu-item key="Login" v-if="!loginState">
+      <a-menu-item key="Login">
         <router-link to="/login">
           <a-icon :type="loginState ? 'setting' : 'login'" />
-          班長登入
+          {{ loginState ? '管理後台' : '班長登入' }}
         </router-link>
       </a-menu-item>
 
-      <a-sub-menu key="sub" v-else>
-        <span slot="title"><a-icon type="down-square" /><span>管理選項</span></span>
-        <a-menu-item key="Admin">
-          <router-link to="/admin">
-            <a-icon type="setting" />管理後台
-          </router-link>
-        </a-menu-item>
-
-        <a-menu-item key="Vacation">
-          <router-link to="/vacation">
-            <a-icon type="carry-out" />設定收假日
-          </router-link>
-        </a-menu-item>
-
-        <a-menu-item key="logout" @click="this.handleLogout">
-          <a-icon type="logout" />登出
-        </a-menu-item>
-      </a-sub-menu>
+      <a-menu-item key="Vacation" v-if="loginState">
+        <router-link to="/vacation">
+          <a-icon type="carry-out" />設定收假日
+        </router-link>
+      </a-menu-item>
     </a-menu>
   </a-layout-header>
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState } from "vuex";
 
 export default {
-  methods: {
-    ...mapActions(['logout']),
-
-    handleLogout() {
-      this.logout();
-      this.$router.replace('/login');
-    }
-  },
   computed: {
     ...mapState(["userSquad", "loginState"]),
   },

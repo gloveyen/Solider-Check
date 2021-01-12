@@ -21,7 +21,7 @@
         </a-layout-content>
       </a-layout>
       <a-layout-footer :style="{ textAlign: 'center' }">
-        Soldier Check v.{{ newestVersion }} © 2020 Created by 117T 1BWPN GloveYen
+        Soldier Check v.{{ newestVersion }} © 2020 Created by GloveYen
       </a-layout-footer>
     </a-layout>
 
