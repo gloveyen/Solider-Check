@@ -33,10 +33,7 @@ export default {
   data() {
     return {
       selectedValue: null,
-      chooseVacation: {
-        start: null,
-        end: null
-      }
+      chooseVacationArray: [null, null]
     }
   },
   methods: {
@@ -62,17 +59,32 @@ export default {
       
     },
     onSelect(value) {
-      if (this.chooseVacation.start) {
-        if (value.format() === this.chooseVacation.start.format()) this.chooseVacation.start = null;
-        if (this.chooseVacation.end) {
-          if (value.format() === this.chooseVacation.end.format()) this.chooseVacation.end = null;
-        } else {
-          this.chooseVacation.end = value;
-        }
-      } else {
-        this.chooseVacation.start = value;
+      const condition = Boolean(this.chooseVacationArray[0]) + Boolean(this.chooseVacationArray[1]);
+      const vacationArrayFormat = this.chooseVacationArray.map(value => value && value.format());
+      const newVacationArray = [...this.chooseVacationArray];
+
+      switch (condition) {
+        case 2: //start & end is choosed
+          var coverIndex = vacationArrayFormat.indexOf(value.format());
+          if (coverIndex !== -1) newVacationArray[coverIndex] = null;
+          break;
+        case 1: //start or end is choosed
+          var notNullIndex = Number(!vacationArrayFormat.indexOf(null));
+          if (vacationArrayFormat[notNullIndex] === value.format()) {
+            newVacationArray[notNullIndex] = null;
+          } else {
+            newVacationArray[Number(!notNullIndex)] = value;
+          }
+          break;
+        case 0: //no choose
+          newVacationArray[0] = value;
+          break;
+        default:
+          break;
       }
-    },
+
+      this.chooseVacationArray = [...newVacationArray];
+      },
     handleSubmit() {
       const { start, end } = this.chooseVacation;
       if (end.unix() > start.unix()) {
@@ -85,21 +97,21 @@ export default {
           de: end.date(),
         }
         this.addVacation(payload);
-        this.$message.succes('已新增假日');
+        this.$message.success('已新增假日');
       } else {
         this.$message.warning('收假日不能比放假日早');
       }
       this.cleanChooseVacation();
     },
     cleanChooseVacation() {
-      this.chooseVacation = {
-        start: null,
-        end: null
-      }
+      this.chooseVacationArray = [null, null]
     }
   },
   computed: {
     ...mapState('Vacations', ["vacationList"]),
+    chooseVacation() {
+      return { start: this.chooseVacationArray[0], end: this.chooseVacationArray[1] }
+    }
   }
 }
 </script>
