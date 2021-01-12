@@ -1,20 +1,20 @@
 <template>
   <div class="home">
     <h2 id="title">
-      257旅步一營兵器連第9班假日 {{ replyStepName[replyStep] }} 回報表單
+      257旅步一營兵器連第{{ userSquadName }}假日 {{ replyStepName[replyStep] }} 回報表單
     </h2>
     <NotReply :now="now" :replyStep="replyStep" />
-    <CheckForm :replyStep="replyStep" />
+    <CheckForm :replyStep="replyStep" :onSoldierChange="onChange" />
   </div>
 </template>
 
 <script>
 import CheckForm from "@/components/CheckForm.vue";
 import NotReply from "@/components/NotReply.vue";
-import { rangeOfStep } from "../utils";
+import { mapState } from "vuex";
 
 export default {
-  name: "Home",
+  name: "Report",
   async mounted() {
     this.now = new Date();
     const { squadId='nbHSds25HAauTGgdrnDs' } = this.$route.params;
@@ -30,12 +30,12 @@ export default {
     };
   },
   computed: {
+    ...mapState(["userSquad", "userSquadName"]),
     replyStep() {
       const now_hours = this.now ? this.now.getHours() : 0;
-      return rangeOfStep(now_hours);
-      // if (now_hours > 1 && now_hours < 12) return 0;
-      // if (12 <= now_hours && now_hours < 18) return 1;
-      // return 2;
+      if (now_hours >= 1 && now_hours < 12) return 0;
+      if (12 <= now_hours && now_hours < 18) return 1;
+      return 2;
     },
     now_hour() {
       return this.now.getHours();
