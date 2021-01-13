@@ -2,7 +2,6 @@
   <div class="admin-view-container">
     <section class="header">
       <h2 id="title">名單編輯後台</h2>
-      <a-button @click="handleLogout">登出</a-button>
     </section>
 
     <a-divider />
@@ -51,7 +50,7 @@
     >
       <template slot="title">
         <div class="tableTitle">
-          <span slot="title" style="color: #333">人員名單編輯表</span>
+          <span slot="title" :style="{color: '#333', fontSize: '16px'}">人員名單編輯表</span>
           <a-button class="clearSoldiers" @click="eliminateOpen">殲滅全班</a-button>
         </div>
       </template>
@@ -375,10 +374,6 @@ export default {
     eliminateCancel() {
       this.eliminateVisible = false;
     },
-    handleLogout() {
-      this.logout();
-      this.$router.push("/login");
-    },
     toReply() {
       this.$router.push(`/${this.focusSquad}/reply-secret`);
     }
@@ -465,6 +460,7 @@ export default {
   }
 
   .tableTitle {
+    display: flex;
     position: relative;
 
     .clearSoldiers{
