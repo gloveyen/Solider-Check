@@ -15,7 +15,6 @@
         <a-radio-group
           v-model="method"
           button-style="solid"
-          @change="onChange"
           v-decorator="[
             'backMethod',
             {

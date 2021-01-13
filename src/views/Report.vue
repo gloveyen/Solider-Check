@@ -4,7 +4,7 @@
       257旅步一營兵器連第{{ userSquadName }}假日 {{ replyStepName[replyStep] }} 回報表單
     </h2>
     <NotReply :now="now" :replyStep="replyStep" />
-    <CheckForm :replyStep="replyStep" :onSoldierChange="onChange" />
+    <CheckForm :replyStep="replyStep" />
   </div>
 </template>
 

@@ -15,7 +15,7 @@ export default {
   actions: {
     queryVacationList: async ({ commit }, { y, m }) => {
       const ref = firebase.firestore().collection("Vacations")
-        .where("me", "in", [m, 0]);
+        .where("me", "in", [m, m+1===12 ? 0 : m+1]);
       const snapshot = await ref.get();
       const data = snapshot.docs.map(doc => ({ id:doc.id, ...doc.data() }));
       commit("saveVacationList", data);
