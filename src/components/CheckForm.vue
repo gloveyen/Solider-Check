@@ -161,8 +161,8 @@
         </a-form-item>
       </section>
 
-      <section v-if="backDay">
-        <a-divider >返營資訊</a-divider>
+      <section v-if="backDay && this.replyStep===0">
+        <a-divider>返營資訊</a-divider>
         <Back />
       </section>
 
@@ -182,10 +182,10 @@ import Back from "@/components/Back.vue";
 export default {
   mounted() {
     this.now = new Date();
+    this.$store.dispatch("Vacations/queryVacationList", { m:this.now.getMonth() });
+
     const weekDay = this.now.getDay();
-    if (weekDay===0 && this.replyStep===0) {
-      this.backDay = true;
-    }
+    if (weekDay===0) this.backDay = true;
   },
   props: {
     replyStep: Number,
@@ -203,6 +203,7 @@ export default {
   },
   computed: {
     ...mapState(["soldiers"]),
+    ...mapState('Vacations', ["vacationList"]),
 
     now_hour() {
       return this.now.getHours();
@@ -235,10 +236,32 @@ export default {
     },
   },
   watch: {
-    replyStep() {
-      const weekDay = this.now.getDay();
-      if (weekDay===0 && this.replyStep===0) {
-        this.backDay = true;
+    vacationList(newValue) {
+      if (newValue.length) { //比對　VacationList 確認收假日使否為平日
+        const weekend = this.now.getDay()===0;
+        const today = { ye: this.now.getFullYear(), me: this.now.getMonth(), de: this.now.getDate() };
+
+        if (weekend) { //如果為週日則確認當天是否為非收假日
+          const todayTimeStamp = new Date(today.ye, today.me, today.de).getTime();
+          for (let i = 0; i <newValue.length; i++) {
+            const { ys, ms, ds, ye, me, de } = newValue[i];
+            const startTimeStamp = new Date(ys, ms, ds).getTime();
+            const BackDayTimeStamp = new Date(ye, me, de).getTime();
+            if (todayTimeStamp < BackDayTimeStamp && todayTimeStamp > startTimeStamp ) {
+              this.backDay = false;
+              break;
+            }  
+          }
+          return;
+        }
+
+        for (let i = 0; i <newValue.length; i++) {
+          const comparison = ['ye', 'me', 'de'].map(key => today[key]===newValue[i][key]);
+          if (comparison.every(bool => bool)) {
+            this.backDay = true;
+            break;
+          }  
+        }
       }
     }
   },
