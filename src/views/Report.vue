@@ -17,7 +17,7 @@ export default {
   name: "Report",
   async mounted() {
     this.now = new Date();
-    const { squadId } = this.$route.params;
+    const { squadId='nbHSds25HAauTGgdrnDs' } = this.$route.params;
     if (this.$route.params.squadId) {
       const response = await this.$store.dispatch("queryUserSquad", squadId);
     }
