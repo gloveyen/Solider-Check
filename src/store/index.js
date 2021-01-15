@@ -1,15 +1,16 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import { hadRetire, rangeOfStep } from "../utils";
 import firebase from "./firebase";
-import { rangeOfStep, hadRetire } from "../utils";
 import Vacations from "./modules/Vacations";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    userSquad: "nbHSds25HAauTGgdrnDs",
+    userSquad: "",
     userSquadName: "",
+    squadList:[],
     soldiers: [],
     replies: [],
     repliesOfSquad: [],
@@ -18,6 +19,9 @@ export default new Vuex.Store({
     loginState: null
   },
   mutations: {
+    saveSquadList: (state, payload) => {
+      state.squadList = payload.map(doc => ({ ...doc }));
+    },
     saveUserSquad: (state, payload) => {
       const { id, name } = payload;
       state.userSquad = id;
@@ -65,6 +69,12 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    querySquadList: async ({ commit }) => {
+      const ref = firebase.firestore().collection("Squads").orderBy('order');
+      const snapShot = await ref.get();
+      const data = snapShot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      commit("saveSquadList", data);
+    },
     queryUserSquad: async ({ commit }, payload) => {
       const ref = firebase.firestore().collection("Squads").doc(payload);
       const snapShot = await ref.get();
