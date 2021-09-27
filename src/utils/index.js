@@ -1,7 +1,6 @@
 export const rangeOfStep = (h) => {
-  if (h >= 1 && h < 12) return 0;
-  if (12 <= h && h < 18) return 1;
-  return 2;
+  if (h >= 4 && h < 16) return 0;
+  if (16 <= h || h < 4) return 1;
 };
 
 export const hadRetire = (firestoreTime) => {

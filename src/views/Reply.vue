@@ -313,7 +313,7 @@ export default {
       if (isAtHome !== null && stayHome) {
         return `在${whereCheck}${
           /[跟,與,和]/g.test(who[0]) ? "" : `與`
-        }${who}${what},預計${stayHome}${liveState[isAtHome]}${
+        }${who}${what}，預計${stayHome}${liveState[isAtHome]}${
           isAtHome === "out" ? " (外宿)" : ""
         }`;
       }

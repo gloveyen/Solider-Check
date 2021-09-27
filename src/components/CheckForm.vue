@@ -28,10 +28,30 @@
       </a-form-item>
 
       <a-form-item label="回報內容:">
-        <a-form-item extra="請確實填入你所在的縣市與鄉鎮">
+        <a-form-item extra="請選擇所在城市與鄉鎮並填入所在位置名稱">
+          <section class="where-space">
+            <a-form-item>
+              <a-select placeholder="縣市" @change="handleCityChange" v-decorator="['city', { rules: [{ required: true, message: '請選擇所在縣市' }]}]">
+                <a-select-option v-for="(city, index) in city" :key="`city_${index}`" :value="city">
+                  {{ city }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+
+            <a-form-item>
+            <a-select placeholder="鄉鎮" v-decorator="['town', { rules: [{ required: true, message: '請選擇所在鄉鎮' }]}]">
+              <template v-if="chooseCity">
+                <a-select-option v-for="(town, index) in townsInCity" :key="`town_${index}`" :value="town">
+                  {{ town }}
+                </a-select-option>
+              </template>
+            </a-select>
+            </a-form-item>
+          </section>
+
           <a-input
-            addon-before="在哪裡"
-            placeholder="ex.嘉義縣太保市家中"
+            addon-before="地點名稱"
+            placeholder="ex.家中"
             v-decorator="[
               'where',
               {
@@ -39,15 +59,12 @@
                   {
                     required: true,
                     message: '請填入你的所在地點',
-                  },
-                  {
-                    pattern: /\w*[縣,市]/,
-                    message: '請確實填寫所在地(填入所在縣市與鄉鎮區)',
-                  },
+                  }
                 ],
               },
             ]"
           />
+
         </a-form-item>
 
         <a-form-item>
@@ -79,7 +96,7 @@
         </a-form-item>
       </a-form-item>
 
-      <a-form-item label="是否在家" v-if="replyStep === 2">
+      <a-form-item label="是否在家" v-if="replyStep === 1">
         <a-radio-group
           v-decorator="[
             'isAtHome',
@@ -103,7 +120,7 @@
         </a-radio-group>
       </a-form-item>
 
-      <a-form-item v-if="replyStep === 2" :label="`幾點${liveState[isAtHome]}`">
+      <a-form-item v-if="replyStep === 1" :label="`幾點${liveState[isAtHome]}`">
         <a-input
           placeholder="ex.2200"
           v-decorator="[
@@ -177,7 +194,9 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
+import { rangeOfStep } from "../utils";
 import Back from "@/components/Back.vue";
+import country from "@/utils/country.json";
 
 export default {
   mounted() {
@@ -185,13 +204,15 @@ export default {
     this.$store.dispatch("Vacations/queryVacationList", { m:this.now.getMonth() });
 
     const weekDay = this.now.getDay();
-    if (weekDay===0) this.backDay = true;
+    if (weekDay===0 && rangeOfStep(this.now.getHours())===0) this.backDay = true;
   },
   props: {
     replyStep: Number,
   },
   data() {
     return {
+      country,
+      chooseCity: null,
       isAtHome: "at",
       now: null,
       formLayout: "horizontal",
@@ -205,6 +226,15 @@ export default {
     ...mapState(["soldiers"]),
     ...mapState('Vacations', ["vacationList"]),
 
+    city() {
+      return Object.keys(this.country)
+    },
+    townsInCity() {
+      if (this.chooseCity) {
+        return country[this.chooseCity].towns
+      }
+      return []
+    },
     now_hour() {
       return this.now.getHours();
     },
@@ -218,8 +248,10 @@ export default {
       this.form.validateFields(async (err, values) => {
         if (!err) {
           this.loading = true;
-          console.log(values);
-          const response = await this.updateReply({ isBackDay: this.backDay, squadId, ...values });
+          // console.log(values);
+          const where = `${values.city}${values.town}${values.where}`;
+          console.log({ isBackDay: this.backDay, squadId, ...values, where });
+          const response = await this.updateReply({ isBackDay: this.backDay, squadId, ...values, where });
           if (response) {
             this.form.resetFields();
             this.querySoldiers(squadId);
@@ -231,13 +263,17 @@ export default {
         }
       });
     },
+    handleCityChange(e) {
+      console.log(e)
+      this.chooseCity = e;
+    },
     onChange(e) {
       this.isAtHome = e.target.value;
     },
   },
   watch: {
     vacationList(newValue) {
-      if (newValue.length) { //比對　VacationList 確認收假日使否為平日
+      if (newValue.length && this.replyStep===0) { //比對　VacationList 確認收假日使否為平日
         const weekend = this.now.getDay()===0;
         const today = { ye: this.now.getFullYear(), me: this.now.getMonth(), de: this.now.getDate() };
 
@@ -283,5 +319,14 @@ export default {
 
 .ant-btn-block {
   margin: 30px 0;
+}
+
+section.where-space {
+  display: flex;
+  column-gap: 8px;
+
+  .ant-form-item {
+    flex-grow: 1;
+  }
 }
 </style>

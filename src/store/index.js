@@ -53,10 +53,10 @@ export default new Vuex.Store({
       state.soldiers.splice(index, 1, { ...state.soldiers[index], updateAt });
     },
     deleteReply: (state, payload) => {
-      const index = state.replies.map((doc) => doc.id).indexOf(payload);
-      const newReplies = [...state.replies];
+      const index = state.repliesOfSquad.map((doc) => doc.id).indexOf(payload);
+      const newReplies = [...state.repliesOfSquad];
       newReplies.splice(index, 1);
-      state.replies = [...newReplies];
+      state.repliesOfSquad = [...newReplies];
     },
     saveLoginState: (state, payload) => {
       state.loginState = payload;
@@ -119,11 +119,12 @@ export default new Vuex.Store({
       console.log({soldier, isBackDay, getOff, backMethod, arrive});
       const ref = firebase.firestore().collection("Replies");
       const soldierRef = firebase.firestore().collection("Soldiers");
+      const updateAt = firebase.firestore.FieldValue.serverTimestamp();
       const reply = {
         ...checkFormData,
         soldier,
         squadId,
-        updateAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updateAt,
       };
       await ref.add({ ...reply });
 
@@ -133,9 +134,7 @@ export default new Vuex.Store({
         await backRepliesRef.add({ ...backInfo });
       }
 
-      await soldierRef
-        .doc(soldier)
-        .update({ updateAt: firebase.firestore.FieldValue.serverTimestamp() });
+      await soldierRef.doc(soldier).update({ updateAt });
 
       return true;
     },
@@ -177,7 +176,11 @@ export default new Vuex.Store({
         const promises = payload.map(({ id, ...doc }) => new Promise(async (res, rej) => {
           const retire = doc.retire=='out' || doc.retire===undefined ? doc.retire : doc.retire.toDate();
           if (doc.hadRetire!==undefined) delete doc.hadRetire;
-          await ref.doc(id).update({ ...doc, retire });
+          if (retire) {
+            await ref.doc(id).update({ ...doc, retire });
+          } else {
+            await ref.doc(id).update({ ...doc });
+          }
           res();
         }))
         await Promise.all(promises);
