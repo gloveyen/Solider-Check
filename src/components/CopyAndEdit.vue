@@ -28,7 +28,7 @@ const combineInfo = ({ soldier, where, who, what, isAtHome = null, stayHome }, s
   const whereCheck =where[0] === "在" ? where.slice(1, where.length) : where;
   const { name, number } = self.soldierObj[soldier];
   if (isAtHome !== null && stayHome) {
-    return `${number}${name}，在${whereCheck}${/[自己]/g.test(who) ? "" : /[跟,與,和]/g.test(who[0]) ? "" + who : `與`+ who}${what},預計${stayHome}${self.liveState[isAtHome]}${isAtHome === "out" ? " (外宿)" : ""}`;
+    return `${number}${name}，在${whereCheck}${/[自己]/g.test(who) ? "" : /[跟,與,和]/g.test(who[0]) ? "" + who : `與`+ who}${what}，預計${stayHome}${self.liveState[isAtHome]}${isAtHome === "out" ? " (外宿)" : ""}`;
   }
   return `${number}${name}，在${whereCheck}${/[自己]/g.test(who) ? "" : /[跟,與,和]/g.test(who[0]) ? "" + who : `與`+ who}${what}`;
 };
@@ -46,7 +46,7 @@ export default {
     return {
       replyString: "",
       liveState: { at: "後不再出門", yet: "回到家中", out: "後不再出門" },
-      methodName: {FAMILY: "由家人載",FRIEND:"由朋友載",BUS:"搭專車"},
+      methodName: {FAMILY: "家接",FRIEND:"朋友載",BUS:"專車"},
       showBackInfo: false,
     };
   },
@@ -84,7 +84,7 @@ export default {
       this.currentRangeReplies
         .map(doc => {
           const backInfo = newVal ? this.soldierBackRepliesObj[doc.soldier] || null : null;
-          const backInfoString = backInfo ? `，預計${backInfo.getOff}出發返營，${this.methodName[backInfo.backMethod]}，預計${backInfo.arrive}${backInfo.backMethod==='BUS'?"抵達專車地點":"到營"}` : "";
+          const backInfoString = backInfo ? `${this.methodName[backInfo.backMethod]}，預計${backInfo.getOff}出發${backInfo.arrive}抵達` : "";
           const originalCombineInfo = combineInfo(doc, this);
           return originalCombineInfo+backInfoString;
         }).join("\n");

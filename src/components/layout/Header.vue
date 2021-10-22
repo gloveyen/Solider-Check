@@ -13,8 +13,7 @@
       :style="{ lineHeight: '64px' }"
     >
       <a-menu-item key="Home">
-        <!-- <router-link :to="userSquad ? `/${userSquad}/report` : '/'"> -->
-        <router-link to="/">
+        <router-link :to="userSquad ? `/${userSquad}/report` : '/'">
           <a-icon type="form" />回報填寫
         </router-link>
       </a-menu-item>

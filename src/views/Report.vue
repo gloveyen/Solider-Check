@@ -17,7 +17,7 @@ export default {
   name: "Report",
   async mounted() {
     this.now = new Date();
-    const { squadId='nbHSds25HAauTGgdrnDs' } = this.$route.params;
+    const { squadId } = this.$route.params;
     if (this.$route.params.squadId) {
       const response = await this.$store.dispatch("queryUserSquad", squadId);
     }
@@ -25,7 +25,7 @@ export default {
   },
   data() {
     return {
-      replyStepName: ["早上9點", "下午3點", "晚上9點"],
+      replyStepName: ["中午11點", "晚上8點"],
       now: null,
     };
   },
@@ -33,9 +33,9 @@ export default {
     ...mapState(["userSquad", "userSquadName"]),
     replyStep() {
       const now_hours = this.now ? this.now.getHours() : 0;
-      if (now_hours >= 1 && now_hours < 12) return 0;
-      if (12 <= now_hours && now_hours < 18) return 1;
-      return 2;
+      console.log(now_hours)
+      if (now_hours >= 4 && now_hours < 16) return 0;
+      if (16 <= now_hours || now_hours < 4) return 1;
     },
     now_hour() {
       return this.now.getHours();
