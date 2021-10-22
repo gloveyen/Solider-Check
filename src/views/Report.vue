@@ -25,7 +25,7 @@ export default {
   },
   data() {
     return {
-      replyStepName: ["中午11點", "晚上9點"],
+      replyStepName: ["中午11點", "晚上8點"],
       now: null,
     };
   },
